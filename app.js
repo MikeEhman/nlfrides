@@ -21,6 +21,12 @@ app.use(express.static(__dirname + '/public'));
 // get the app environment from Cloud Foundry
 var appEnv = cfenv.getAppEnv();
 
+// response and request routing
+app.get("/", function(request, response){
+  response.sendFile("main.html");
+});
+
+
 // start server on the specified port and binding host
 app.listen(appEnv.port, function() {
 
