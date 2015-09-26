@@ -23,7 +23,7 @@ var appEnv = cfenv.getAppEnv();
 
 // response and request routing
 app.get("/", function(request, response){
-  response.sendFile("main.html");
+  response.sendFile("index.html");
 });
 
 
