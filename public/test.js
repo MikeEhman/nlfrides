@@ -186,14 +186,11 @@ QUnit.test("Driver-Drivee Feability Test", function(assert) {
 
 });
 
-QUnit.test("Real Dataset Test", function(assert){
-  var people = [];
-  assert.ok(1==1);
+function getTestData (callback) {
   $.get("/testdata",function(data,error){
+    var people = [];
+    console.log(data);
     $.each(data, function(index, row) {
-
-      assert.ok(data!=undefined);
-
       if (index > 0) {
         var person = new Person();
         person.id = row[1];
@@ -224,13 +221,19 @@ QUnit.test("Real Dataset Test", function(assert){
         people.push(person);
 
       }
-    });
 
+    });
+    callback(people);
+
+  });
+
+}
+
+QUnit.test("Real Dataset Test", function(assert){
+  getTestData(function(people){
 
     var rideData = putPeople(people);
-
-
-
+    console.log(rideData);
 
     var group= rideData.groups;
     var marginal = rideData.marginal;
@@ -260,20 +263,10 @@ QUnit.test("Real Dataset Test", function(assert){
     console.log(marginal);
     $.each(marginal, function(m, person){
       console.log(person.name+person.goTime+"-"+person.backTime + " has no driver");
-
-
     });
 
+    console.log(rideData);
     excelize(rideData);
 
-
   });
-
-});
-
-QUnit.test("Excelize", function(assert){
-  var fakeData = {name:"gordon",age:22};
-  assert.ok(fakeData!=undefined);
-  excelize(fakeData);
-
 });

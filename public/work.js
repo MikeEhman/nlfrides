@@ -28,7 +28,7 @@ function score (person, curDriver, period) {
   var point = 0;
   if (curDriver.goTime==person.goTime && curDriver.backTime==person.backTime) {
     // synergy boost
-    point += 5;
+    point += 15;
   }
 
   if (person.location=="oc" && curDriver.hc == person.hc) {
@@ -46,10 +46,10 @@ function score (person, curDriver, period) {
   }
 
   if (curDriver.hc == person.hc) {
-    point += 2;
+    point += 5;
   }
 
-  point += (curDriver.spotsLeft)*3;
+  point += (curDriver.spotsLeft)*7;
   return point;
 }
 
@@ -198,6 +198,8 @@ function putPeople (people) {
 
   });
 
+  console.log(drivers);
+
   // initialize drivers' spots
   $.each(drivers, function(index, driver){
     driver.theirGoDrivees = [];
@@ -212,6 +214,20 @@ function putPeople (people) {
     });
 
     $.each(drivees, function(index, drivee) {
+      var bestDriver = pickBestDriver(drivee, drivers, i);
+      console.log(bestDriver);
+      if (bestDriver.id==-1) {
+         marginal.push(drivee);
+      } else {
+      if (i==1)
+        bestDriver.theirGoDrivees.push(drivee);
+      else
+        bestDriver.theirBackDrivees.push(drivee);
+        bestDriver.spotsLeft -= 1;
+      }
+    });
+
+    $.each(fdrivees, function(index, drivee) {
       var bestDriver = pickBestDriver(drivee, drivers, i);
       console.log(bestDriver);
       if (bestDriver.id==-1) {
@@ -247,6 +263,8 @@ function putPeople (people) {
     group4.push(driver)
     }
   });
+
+  console.log(group1);
 
   // left with go1 go2 back1 back2
   return {groups:[group1, group2, group3, group4], marginal:marginal};
@@ -362,6 +380,7 @@ function generatePeople (n) {
 
 function excelize (data) {
   //accepts raw data, converts to excep-friendly form
+  console.log("excelizing");
   var eArr = [];
   $.each(data.groups, function(index,g){
     $.each(g,function(d,driver){
@@ -388,14 +407,11 @@ function excelize (data) {
     mArr.push(person.name);
   });
   eArr.push(mArr);
-  console.log(eArr);
   eArr = transpose(eArr);
-  console.log(eArr);
   var eData = {arrs:eArr}
 
+  console.log(eData);
   $.post("/excelize", eData, function(error,response){
-
-
-
+    window.location.replace("/download");
   });
 }

@@ -41,14 +41,13 @@ app.get("/testdata", function(request, response) {
   var workbook = XLSX.readFile('public/nlfcarpools.xlsx');
   /* DO SOMETHING WITH workbook HERE */
   var worksheet = workbook.Sheets["Rides Form Responses"];
-  console.log(workbook);
-  console.log(worksheet);
   response.send(XLSX.utils.sheet_to_json(worksheet, {header:1}).slice(0,31)); // <-- this is an array of arrays that you can use
 
 
 });
 
 app.post("/excelize", function(request, response){
+  console.log("received /excelize request");
   var xlsx = require('node-xlsx');
   var worksheets = [];
   var arrs = request.body.arrs;
@@ -60,13 +59,18 @@ app.post("/excelize", function(request, response){
   // var buff = xlsx.build([{name:"Auto-gernerate Ride Sheet", data:arrs}]);
 
   console.log(buff);
-  var f = fs.writeFile("./public/results.xlsx",buff, function(err){
-
-    console.log(f);
-
+  var f = fs.writeFile("./public/results.xlsx",buff,function(err){
+      response.end();
   });
 
-  //response.sendFile("/public/results.xlsx",{root:__dirname});
+});
+
+app.get("/download", function(request,response){
+  console.log("received /download request");
+  response.download(__dirname + "/public/results.xlsx", function(err){
+    console.log(err);
+
+  });
 
 });
 
