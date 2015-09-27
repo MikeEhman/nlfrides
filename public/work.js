@@ -5,6 +5,23 @@ function run () {
 
 }
 
+function transpose(array) {
+
+  // make dimensions consistent
+  for (var i=0; i<array.length; i++) {
+    while (array[i].length<5) {
+      array[i].push("");
+    }
+  }
+
+  var newArray = array[0].map(function(col, i) {
+  return array.map(function(row) {
+    return row[i]
+    })
+  });
+  return newArray;
+}
+
 function loadAllPeople () {}
 
 function score (person, curDriver, period) {
@@ -32,7 +49,7 @@ function score (person, curDriver, period) {
     point += 2;
   }
 
-  point += (curDriver.spotsLeft+4);
+  point += (curDriver.spotsLeft)*3;
   return point;
 }
 
@@ -341,5 +358,44 @@ function generatePeople (n) {
   }
   return people;
 
+}
 
+function excelize (data) {
+  //accepts raw data, converts to excep-friendly form
+  var eArr = [];
+  $.each(data.groups, function(index,g){
+    $.each(g,function(d,driver){
+      var dArr = [];
+      if (index==0 || index==2){
+        dArr = [driver.name + "(service: " + driver.goTime + ", going)"];
+        $.each(driver.theirGoDrivees, function(p,passenger){
+          dArr.push(passenger.name);
+        });
+      }
+
+      if (index==1 || index==3) {
+        dArr = [driver.name + "(service: " + driver.backTime + ", coming back)"];
+        $.each(driver.theirBackDrivees, function(p,passenger){
+          dArr.push(passenger.name);
+        });
+      }
+
+      eArr.push(dArr);
+    });
+  });
+  var mArr = ["No Driver"];
+  $.each(data.marginal, function(index,person){
+    mArr.push(person.name);
+  });
+  eArr.push(mArr);
+  console.log(eArr);
+  eArr = transpose(eArr);
+  console.log(eArr);
+  var eData = {arrs:eArr}
+
+  $.post("/excelize", eData, function(error,response){
+
+
+
+  });
 }

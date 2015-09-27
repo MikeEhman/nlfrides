@@ -261,8 +261,19 @@ QUnit.test("Real Dataset Test", function(assert){
     $.each(marginal, function(m, person){
       console.log(person.name+person.goTime+"-"+person.backTime + " has no driver");
 
+
     });
 
+    excelize(rideData);
+
+
   });
+
+});
+
+QUnit.test("Excelize", function(assert){
+  var fakeData = {name:"gordon",age:22};
+  assert.ok(fakeData!=undefined);
+  excelize(fakeData);
 
 });
