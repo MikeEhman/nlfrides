@@ -225,7 +225,13 @@ QUnit.test("Real Dataset Test", function(assert){
 
       }
     });
+
+
     var rideData = putPeople(people);
+
+
+
+
     var group= rideData.groups;
     var marginal = rideData.marginal;
     assert.ok(group.length>0);
@@ -246,7 +252,17 @@ QUnit.test("Real Dataset Test", function(assert){
           console.log(drivee.name+drivee.goTime + "-" + drivee.backTime);
         });
       });
+
+
+
     });
+
+    console.log(marginal);
+    $.each(marginal, function(m, person){
+      console.log(person.name+person.goTime+"-"+person.backTime + " has no driver");
+
+    });
+
   });
 
 });

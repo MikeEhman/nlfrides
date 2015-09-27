@@ -99,6 +99,61 @@ function flex(person, fdrivers, period) {
 
 }
 
+function formCar (driver) {
+  var newCar = new Car();
+  newCar.driver = driver;
+  newCar.drivee
+
+}
+
+function mergeCars (driver1, driver2) {
+  var score = 0;
+  var threshold = 5;
+  console.log(driver1);
+  console.log(driver2);
+  if (driver1.goTime==driver2.goTime && driver1.backTime==driver2.backTime) {
+    if (driver1.theirGoDrivees.length + 1 + driver2.theirGoDrivees.length <= 5) {
+      if (driver1.theirBackDrivees.length + 1 + driver2.theirBackDrivees.length <= 5) {
+        driver2.theirGoDrivees = driver1.theirGoDrivees.concat(driver2.theirGoDrivees);
+        driver2.theirGoDrivees.push(driver1);
+        driver2.theirBackDrivees = driver1.theirBackDrivees.concat(driver2.theirBackDrivees);
+        driver2.theirBackDrivees.push(driver1);
+        driver1.isDriver = false;
+        return driver2;
+      }
+    }
+  }
+  return driver1;
+}
+
+function trimGroup (group, period) {
+
+  if (group.length==0) return group;
+
+  group.sort(function(a,b){
+    if (period==1) {
+      akey = a.theirGoDrivees.length + 1;
+      bkey = b.theirGoDrivees.length + 1;
+    } else {
+      akey = a.theirBackDrivees.length + 1;
+      bkey = b.theirBackDrivees.length + 1;
+    }
+    if (akey<bkey) return -1;
+    else if (akey==bkey) return 0;
+    else return 1;
+  });
+
+  console.log(group);
+
+  group.reduce(function(a,b){
+    return mergeCars(a,b);
+  });
+
+  return group;
+
+}
+
+
 function putPeople (people) {
   // people is a list of people
   // this returns four groups of drivers with their respective passengers
@@ -143,29 +198,18 @@ function putPeople (people) {
       var bestDriver = pickBestDriver(drivee, drivers, i);
       console.log(bestDriver);
       if (bestDriver.id==-1) {
-        bestDriver = flex(drivee, fdrivers, i);
+         marginal.push(drivee);
+      } else {
+      if (i==1)
+        bestDriver.theirGoDrivees.push(drivee);
+      else
+        bestDriver.theirBackDrivees.push(drivee);
+        bestDriver.spotsLeft -= 1;
       }
-      if (bestDriver.id!=-1){
-        if (i==1)
-          bestDriver.theirGoDrivees.push(drivee);
-        else
-          bestDriver.theirBackDrivees.push(drivee);
-          bestDriver.spotsLeft -= 1;
-      } else marginal.push(drivee);
-
     });
 
   };
 
-  // lonely driver solution
-  var flag = false;
-  $.each(drivers, function(index, driver){
-    // if (driver.theirDrivees().length==0)
-    //   driver.isDriver = false;
-    //   flag = true;
-  });
-
-  if (flag) return putPeople(people);
 
   var group1 = [];
   var group2 = [];
@@ -234,6 +278,8 @@ var Driver = function () {
   this.backTime = "";
   this.theirDrivees = [];
 }
+
+
 
 // person.prototype.setName(name) {
 //   this.name = name;
