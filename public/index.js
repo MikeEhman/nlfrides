@@ -19,13 +19,39 @@ function nextSunday(d) {
   return d;
 }
 
+function checkRequired() {
+  return false;
 
+}
+
+function showRequired() {
+
+
+}
+
+function submitinfo() {
+
+}
 
 $(document).ready(function(){
   console.log("index.js loaded!");
+
+  // datepicker
+
   var dp = $("#dp");
   console.log(dp);
   dp.datepicker({format:"mm/dd/yyyy"});
   dp.datepicker('setValue',nextSunday());
+
+  // submit button
+  $('#submitbtn').click(function(){
+    console.log("click");
+    if (checkRequired()) {
+      submitinfo();
+    } else {
+      showRequired();
+    }
+  });
+
 
 });
