@@ -153,23 +153,23 @@ QUnit.test("Driver-Drivee Feability Test", function(assert) {
   assert.ok(driverForJP==willie, driverForJP.name + " goes with " + jp.name);
   assert.ok(driverForRosalina==david, driverForRosalina.name + " comes back with " + rosalina.name);
 
-  var group = putPeople(people);
+  var group = putPeople(people).groups;
 
-  console.log(group);
-
-  assertString = "";
-  $.each(group, function(index, g) {
-    $.each(g, function(jndex, driver){
-      assertString += driver.name + " drives the following: [";
-      $.each(driver.theirDrivees, function(gndex, drivee){
-        assertString += "\n" + drivee.name +", ";
-      });
-      assertString += "]";
-    })
+  $.each(drivers, function(d, driver) {
+    console.log(driver.name + driver.goTime + "-" + driver.backTime + " drives to church:");
+    $.each(driver.theirGoDrivees, function(dr, drivee) {
+      console.log(drivee.name+drivee.goTime + "-" + drivee.backTime);
+    });
   });
 
-  assert.ok(group.length==4, assertString);
+  $.each(drivers, function(d, driver) {
+    console.log(driver.name + driver.goTime + "-" + driver.backTime + " drives home:");
+    $.each(driver.theirBackDrivees, function(dr, drivee) {
+      console.log(drivee.name+drivee.goTime + "-" + drivee.backTime);
+    });
+  });
 
+  assert.ok(sean.theirGoDrivees.indexOf(rosalina)==-1, "Sean can't drive rosalina to church");
 
   // this.id = -1;
   // this.name = "John Doe";
@@ -183,5 +183,70 @@ QUnit.test("Driver-Drivee Feability Test", function(assert) {
   // this.hc = "saigon";
   // this.location = "south";
   // this.etc = "asdfghjkqweryuio";
+
+});
+
+QUnit.test("Real Dataset Test", function(assert){
+  var people = [];
+  assert.ok(1==1);
+  $.get("/testdata",function(data,error){
+    $.each(data, function(index, row) {
+
+      assert.ok(data!=undefined);
+
+      if (index > 0) {
+        var person = new Person();
+        person.id = row[1];
+        person.name = row[2];
+        person.hc = row[3];
+        person.location = row[4];
+        if (row[5]=="1st (9:00AM)"){
+          person.goTime = 1;
+          person.backTime = 1;
+        }
+        if (row[5]=="2nd (11:00AM)"){
+          person.goTime = 2;
+          person.backTime = 2;
+        }
+        if (row[5]=="Both"){
+          person.goTime = 1;
+          person.backTime = 2;
+        }
+        if (row[5]=='Either works for me (indicate preference in "Additional Info")'){
+          person.goTime = 1;
+          person.backTime = 1;
+          person.flexible = true;
+        }
+        if (row[6]=="Yes") {
+          person.isDriver = true;
+        }
+
+        people.push(person);
+
+      }
+    });
+    var rideData = putPeople(people);
+    var group= rideData.groups;
+    var marginal = rideData.marginal;
+    assert.ok(group.length>0);
+    assert.ok(marginal.length<10);
+
+    $.each(group, function(g, drivers){
+
+      $.each(drivers, function(d, driver) {
+        console.log(driver.name + driver.goTime + "-" + driver.backTime + " drives to church:");
+        $.each(driver.theirGoDrivees, function(dr, drivee) {
+          console.log(drivee.name+drivee.goTime + "-" + drivee.backTime);
+        });
+      });
+
+      $.each(drivers, function(d, driver) {
+        console.log(driver.name + driver.goTime + "-" + driver.backTime + " drives home:");
+        $.each(driver.theirBackDrivees, function(dr, drivee) {
+          console.log(drivee.name+drivee.goTime + "-" + drivee.backTime);
+        });
+      });
+    });
+  });
 
 });

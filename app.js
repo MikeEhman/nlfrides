@@ -32,6 +32,19 @@ app.get("/test", function(request, response){
   return;
 });
 
+app.get("/testdata", function(request, response) {
+  console.log("received /testdata request");
+  var xlsx = require('xlsx');
+  if(typeof require !== 'undefined') XLSX = require('xlsx');
+  var workbook = XLSX.readFile('public/nlfcarpools.xlsx');
+  /* DO SOMETHING WITH workbook HERE */
+  var worksheet = workbook.Sheets["Rides Form Responses"];
+  console.log(workbook);
+  console.log(worksheet);
+  response.send(XLSX.utils.sheet_to_json(worksheet, {header:1}).slice(0,31)); // <-- this is an array of arrays that you can use
+
+
+});
 
 // start server on the specified port and binding host
 app.listen(appEnv.port, function() {
