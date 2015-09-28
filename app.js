@@ -18,7 +18,7 @@ var app = express();
 // serve the files out of ./public as our main files
 app.use(express.static(__dirname + '/public'));
 var bodyParser = require('body-parser');
-app.use(bodyParser.urlencoded());
+app.use(bodyParser);
 //
 var busboy = require('connect-busboy');
 app.use(busboy());
