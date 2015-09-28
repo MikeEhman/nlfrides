@@ -5,6 +5,47 @@ function run () {
 
 }
 
+function parseNLF(rowarray) {
+  var people = [];
+  console.log(rowarray);
+  $.each(rowarray, function(index, row) {
+
+    if (index > 0 && row.length>0) {
+      var person = new Person();
+      person.id = row[1];
+      person.name = row[2];
+      person.hc = row[3];
+      person.location = row[4];
+      if (row[5]=="1st (9:00AM)"){
+        person.goTime = 1;
+        person.backTime = 1;
+      }
+      if (row[5]=="2nd (11:00AM)"){
+        person.goTime = 2;
+        person.backTime = 2;
+      }
+      if (row[5]=="Both"){
+        person.goTime = 1;
+        person.backTime = 2;
+      }
+      if (row[5]=='Either works for me (indicate preference in "Additional Info")'){
+        person.goTime = 1;
+        person.backTime = 1;
+        person.flexible = true;
+      }
+      if (row[6]=="Yes") {
+        person.isDriver = true;
+      }
+
+      people.push(person);
+
+    }
+  });
+  return people;
+
+
+}
+
 function transpose(array) {
 
   // make dimensions consistent

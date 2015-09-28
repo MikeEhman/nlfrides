@@ -19,7 +19,11 @@ var app = express();
 app.use(express.static(__dirname + '/public'));
 var bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded());
+//
+var busboy = require('connect-busboy');
+app.use(busboy());
 
+var fs = require('fs');
 // get the app environment from Cloud Foundry
 var appEnv = cfenv.getAppEnv();
 
@@ -43,8 +47,34 @@ app.get("/testdata", function(request, response) {
   var worksheet = workbook.Sheets["Rides Form Responses"];
   response.send(XLSX.utils.sheet_to_json(worksheet, {header:1}).slice(0,31)); // <-- this is an array of arrays that you can use
 
-
 });
+
+app.post("/excel/upload", busboy(), function(request, response){
+  console.log("/excel/upload received");
+  var fstream;
+  request.pipe(request.busboy);
+  request.busboy.on('file', function (fieldname, file, filename) {
+    console.log("file received");
+    console.log("Uploading: " + filename);
+    fstream = fs.createWriteStream(__dirname + filename);
+    file.pipe(fstream);
+    fstream.on('close', function () {
+        response.sendFile("/public/download.html",{root:__dirname});
+      });
+    });
+});
+
+app.post("/excel/read", function(request, response){
+  var filename = request.body.filename;
+  console.log(request.body);
+  var xlsx = require('node-xlsx');
+  if(typeof require !== 'undefined') XLSX = require('xlsx');
+  var workbook = XLSX.readFile(__dirname + "/public"+filename);
+  /* DO SOMETHING WITH workbook HERE */
+  var worksheet = workbook.Sheets["Rides Form Responses"];
+  response.send(XLSX.utils.sheet_to_json(worksheet, {header:1})); // <-- this is an array of arrays that you can use
+});
+
 
 app.post("/excelize", function(request, response){
   console.log("received /excelize request");
@@ -72,6 +102,10 @@ app.get("/download", function(request,response){
 
   });
 
+});
+
+app.get("/excel", function(request,response){
+  response.sendFile("/public/excel.html", {root:__dirname});
 });
 
 // start server on the specified port and binding host
